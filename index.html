@@ -25,7 +25,7 @@
     .typing span:nth-child(2) { animation-delay: .2s; }
     .typing span:nth-child(3) { animation-delay: .4s; }
     @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
-    .footer { background: white; padding: 12px 16px; border-top: 1px solid #F0D9E5; }
+    .footer { background: white; padding: 12px 16px; border-top: 1px solid #F0D9E5; padding-bottom: env(safe-area-inset-bottom, 12px); }
     .quick { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
     .qbtn { font-size: 12px; padding: 5px 12px; border-radius: 20px; border: 1px solid #F0D9E5; background: white; color: #9B7A87; cursor: pointer; transition: all .15s; }
     .qbtn:hover { background: #FDF6F9; border-color: #D4537E; color: #D4537E; }
