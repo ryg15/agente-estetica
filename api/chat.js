@@ -10,22 +10,22 @@ export default async function handler(req, res) {
   const ahora = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
   const fechaActual = ahora.toLocaleString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-  const diasSemana = [];
+  const diasMes = [];
   for (let i = 0; i < 30; i++) {
     const dia = new Date(ahora);
     dia.setDate(ahora.getDate() + i);
-    diasSemana.push(dia.toLocaleString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }));
+    diasMes.push(dia.toLocaleString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }));
   }
-  const calendarioMes = diasSemana.join('\n');
+  const calendarioMes = diasMes.join('\n');
 
   const tools = [
     {
       name: 'verificar_disponibilidad',
-      description: 'Verifica si un día y hora están disponibles antes de confirmar un turno. Siempre llamá esta herramienta antes de guardar_turno.',
+      description: 'Verifica si un día y hora están disponibles antes de confirmar un turno. SIEMPRE llamá esta herramienta antes de guardar_turno.',
       input_schema: {
         type: 'object',
         properties: {
-          dia: { type: 'string', description: 'Día del turno exacto como aparece en el calendario' },
+          dia: { type: 'string', description: 'Día exacto como aparece en el calendario' },
           hora: { type: 'string', description: 'Hora del turno' }
         },
         required: ['dia', 'hora']
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     },
     {
       name: 'guardar_turno',
-      description: 'Guarda un turno confirmado. Solo llamá esta herramienta después de verificar_disponibilidad y confirmar que está libre.',
+      description: 'Guarda un turno confirmado. Solo llamá después de verificar_disponibilidad y confirmar que está libre.',
       input_schema: {
         type: 'object',
         properties: {
@@ -48,13 +48,13 @@ export default async function handler(req, res) {
     },
     {
       name: 'guardar_lead',
-      description: 'Guarda una clienta interesada en promos o info.',
+      description: 'Guarda una persona interesada. Llamá esta herramienta cuando alguien pida información sobre tratamientos, precios o promociones.',
       input_schema: {
         type: 'object',
         properties: {
           nombre: { type: 'string' },
-          contacto: { type: 'string' },
-          interes: { type: 'string' }
+          contacto: { type: 'string', description: 'WhatsApp o email' },
+          interes: { type: 'string', description: 'Qué tratamiento o info le interesa' }
         },
         required: ['interes']
       }
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify(input)
       });
-      return `Turno guardado correctamente para ${input.nombre} el ${input.dia} a las ${input.hora}.`;
+      return `Turno guardado para ${input.nombre} el ${input.dia} a las ${input.hora}.`;
     }
 
     if (nombre === 'guardar_lead') {
@@ -132,15 +132,15 @@ Tu trabajo es:
 4. SIEMPRE llamá verificar_disponibilidad antes de confirmar un turno
 5. Si el horario está ocupado, ofrecé alternativas cercanas
 6. Cuando el horario esté libre y tengas todos los datos, llamá guardar_turno
-7. Cuando alguien pida promos o info, pedile nombre y contacto y llamá guardar_lead
+7. Cuando alguien pida información sobre tratamientos, precios o promociones, pedile nombre y WhatsApp o email, y llamá guardar_lead inmediatamente. No esperes — cualquier consulta es un lead potencial.
 8. Recomendar tratamientos según lo que describe la clienta
 
 Tratamientos disponibles:
 - Limpieza facial profunda: $850 · 60min
-- Hydrafacial premium: $1200 · 75min
+- Hydrafacial premium: $1.200 · 75min
 - Peeling vitamina C: $620 · 45min
 - Peeling químico: $980 · 45min
-- Drenaje linfático: $1050 · 90min
+- Drenaje linfático: $1.050 · 90min
 - Masaje relajante: $800 · 60min
 - Masaje con piedras calientes: $900 · 90min
 
