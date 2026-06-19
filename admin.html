@@ -179,7 +179,14 @@
     else cargarLeads();
   }
 
-  cargarTurnos();
+ cargarTurnos();
+
+// Auto-actualización cada 30 segundos
+setInterval(() => {
+  const tabActiva = document.querySelector('.tab.active').textContent.includes('Turnos') ? 'turnos' : 'leads';
+  if (tabActiva === 'turnos') cargarTurnos();
+  else cargarLeads();
+}, 30000);
 </script>
 </body>
 </html>
