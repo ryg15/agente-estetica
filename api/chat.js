@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   const tools = [
     {
       name: 'verificar_disponibilidad',
-      description: 'Verifica si un día y hora están disponibles antes de confirmar un turno. SIEMPRE llamá esta herramienta antes de guardar_turno.',
+      description: 'Verifica si un día y hora están disponibles. SIEMPRE llamá esta herramienta antes de guardar_turno.',
       input_schema: {
         type: 'object',
         properties: {
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     },
     {
       name: 'guardar_turno',
-      description: 'Guarda un turno confirmado. Solo llamá después de verificar_disponibilidad y confirmar que está libre.',
+      description: 'Guarda un turno confirmado. Solo llamá después de verificar_disponibilidad.',
       input_schema: {
         type: 'object',
         properties: {
@@ -48,15 +48,15 @@ export default async function handler(req, res) {
     },
     {
       name: 'guardar_lead',
-      description: 'Guarda una persona interesada. Llamá esta herramienta cuando alguien pida información sobre tratamientos, precios o promociones.',
+      description: 'Guarda una clienta interesada. Solo llamá cuando la clienta mostró intención real: quiere que la contacten, pide promociones, o quiere agendar pero no puede ahora. NUNCA guardes sin nombre Y contacto (WhatsApp o email).',
       input_schema: {
         type: 'object',
         properties: {
-          nombre: { type: 'string' },
+          nombre: { type: 'string', description: 'Nombre de la clienta' },
           contacto: { type: 'string', description: 'WhatsApp o email' },
           interes: { type: 'string', description: 'Qué tratamiento o info le interesa' }
         },
-        required: ['interes']
+        required: ['nombre', 'contacto', 'interes']
       }
     }
   ];
@@ -101,7 +101,7 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify(input)
       });
-      return `Lead guardado correctamente.`;
+      return `Lead guardado: ${input.nombre} interesada en ${input.interes}.`;
     }
   }
 
@@ -127,12 +127,12 @@ ${calendarioMes}
 
 Tu trabajo es:
 1. Detectar el idioma en que escribe la clienta y responder siempre en ese mismo idioma
-2. Responder consultas sobre tratamientos con calidez y profesionalismo
-3. Ayudar a agendar turnos — preguntá nombre, tratamiento, día y hora preferidos
-4. SIEMPRE llamá verificar_disponibilidad antes de confirmar un turno
-5. Si el horario está ocupado, ofrecé alternativas cercanas
-6. Cuando el horario esté libre y tengas todos los datos, llamá guardar_turno
-7. REGLA OBLIGATORIA: En CADA conversación, sin excepción, debés pedir nombre y WhatsApp o email a la clienta. Si pregunta por precios, respondé el precio Y luego decí "Para enviarte más información y promociones, ¿me podés dar tu nombre y WhatsApp o email?". Llamá guardar_lead en cuanto tengas aunque sea el interés, sin esperar nombre ni contacto. Si después te dan nombre y contacto, actualizá el lead.
+2. Responder primero lo que pregunta la clienta con toda la información, de forma cálida y profesional
+3. Interpretar lo que la clienta quiere aunque no use el nombre exacto del tratamiento. Si dice "limpieza", entendé "Limpieza facial profunda". Si dice "masaje", preguntá cuál prefiere. Si dice "peeling", preguntá cuál
+4. Al final de cada respuesta informativa, agregá una invitación natural como "¿Te gustaría agendar una sesión?" o "¿Querés que te contactemos con más info?" — sin pedir datos todavía
+5. Solo pedí nombre y contacto cuando la clienta muestre intención real: dice que quiere que la contacten, pide promociones, quiere agendar pero no puede ahora, o dice "me interesa". En ese momento decí "¡Perfecto! ¿Me dejás tu nombre y WhatsApp o email para coordinarlo?"
+6. Solo llamá guardar_lead cuando tengas nombre Y contacto (WhatsApp o email). Sin los dos datos, no guardes nada
+7. Para agendar turnos: preguntá nombre, tratamiento, día y hora. SIEMPRE llamá verificar_disponibilidad antes de confirmar. Si el horario está ocupado, ofrecé alternativas cercanas. Cuando esté libre, llamá guardar_turno
 8. Recomendar tratamientos según lo que describe la clienta
 
 Tratamientos disponibles:
@@ -146,7 +146,7 @@ Tratamientos disponibles:
 
 Horarios: lunes a sábado 9:00 a 19:00.
 
-Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Confirmá el turno en la base de datos de todas formas y avisale a la clienta que tiene 2 horas para enviar la seña, caso contrario el turno se libera.
+Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Confirmá el turno en la base de datos y avisale a la clienta que tiene 2 horas para enviar la seña, caso contrario el turno se libera.
 
 Usá tono cálido y profesional. Usá saltos de línea para fácil lectura.`,
         messages: historial
