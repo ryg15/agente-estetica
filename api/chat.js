@@ -1,10 +1,3 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY
-)
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -15,28 +8,28 @@ export default async function handler(req, res) {
   const tools = [
     {
       name: 'guardar_turno',
-      description: 'Guarda un turno agendado en la base de datos. Llamá esta herramienta cuando tengas nombre, tratamiento, día y hora confirmados.',
+      description: 'Guarda un turno agendado. Llamá cuando tengas nombre, tratamiento, día y hora confirmados.',
       input_schema: {
         type: 'object',
         properties: {
-          nombre: { type: 'string', description: 'Nombre de la clienta' },
-          tratamiento: { type: 'string', description: 'Tratamiento elegido' },
-          dia: { type: 'string', description: 'Día del turno' },
-          hora: { type: 'string', description: 'Hora del turno' },
-          canal: { type: 'string', description: 'Canal: Web, WhatsApp, Instagram, etc' }
+          nombre: { type: 'string' },
+          tratamiento: { type: 'string' },
+          dia: { type: 'string' },
+          hora: { type: 'string' },
+          canal: { type: 'string' }
         },
         required: ['nombre', 'tratamiento', 'dia', 'hora']
       }
     },
     {
       name: 'guardar_lead',
-      description: 'Guarda una clienta interesada en promociones o información. Llamá cuando alguien pida promos o quiera recibir novedades.',
+      description: 'Guarda una clienta interesada en promos o info.',
       input_schema: {
         type: 'object',
         properties: {
-          nombre: { type: 'string', description: 'Nombre de la clienta' },
-          contacto: { type: 'string', description: 'WhatsApp, email o Instagram' },
-          interes: { type: 'string', description: 'Qué le interesa' }
+          nombre: { type: 'string' },
+          contacto: { type: 'string' },
+          interes: { type: 'string' }
         },
         required: ['interes']
       }
@@ -73,23 +66,31 @@ Tratamientos disponibles:
 - Masaje con piedras calientes: $9.500 · 90min
 
 Horarios: lunes a sábado 9:00 a 19:00.
-Usá tono cálido y profesional. Usá saltos de línea para que sea fácil de leer.`,
+Usá tono cálido y profesional. Usá saltos de línea para fácil lectura.`,
       messages: messages
     })
   });
 
   const data = await response.json();
 
-  // Procesar herramientas si el modelo las usa
+  // Si el modelo usó una herramienta, guardamos en Supabase
   if (data.stop_reason === 'tool_use') {
     for (const block of data.content) {
       if (block.type === 'tool_use') {
-        if (block.name === 'guardar_turno') {
-          await supabase.from('turnos').insert(block.input);
-        }
-        if (block.name === 'guardar_lead') {
-          await supabase.from('leads').insert(block.input);
-        }
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+        const table = block.name === 'guardar_turno' ? 'turnos' : 'leads';
+
+        await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify(block.input)
+        });
       }
     }
   }
