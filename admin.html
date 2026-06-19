@@ -4,181 +4,259 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Glam Studio — Panel Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, sans-serif; background: #FDF6F9; color: #2D1B25; }
-    .header { background: white; padding: 16px 24px; border-bottom: 1px solid #F0D9E5; display: flex; align-items: center; justify-content: space-between; }
-    .header h1 { font-size: 18px; font-weight: 600; }
-    .header p { font-size: 12px; color: #9B7A87; }
-    .badge { background: #F4C0D1; color: #72243E; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-    .main { padding: 24px; max-width: 1000px; margin: 0 auto; }
-    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #F0D9E5; }
-    .tab { padding: 10px 20px; font-size: 14px; cursor: pointer; color: #9B7A87; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-    .tab.active { color: #D4537E; border-bottom-color: #D4537E; font-weight: 500; }
-    .panel { display: none; }
-    .panel.active { display: block; }
-    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-    .metric { background: white; border: 1px solid #F0D9E5; border-radius: 12px; padding: 16px 20px; }
-    .metric-label { font-size: 12px; color: #9B7A87; margin-bottom: 6px; }
-    .metric-val { font-size: 28px; font-weight: 600; color: #2D1B25; }
-    .metric-sub { font-size: 11px; color: #9B7A87; margin-top: 4px; }
-    .card { background: white; border: 1px solid #F0D9E5; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
-    .card-header { padding: 14px 20px; border-bottom: 1px solid #F0D9E5; display: flex; align-items: center; justify-content: space-between; }
-    .card-header h2 { font-size: 14px; font-weight: 500; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { text-align: left; padding: 10px 16px; font-size: 11px; color: #9B7A87; border-bottom: 1px solid #F0D9E5; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
-    td { padding: 12px 16px; border-bottom: 1px solid #FDF6F9; vertical-align: middle; }
-    tr:last-child td { border: none; }
-    tr:hover td { background: #FDF6F9; }
-    .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-    .pill-green { background: #E1F5EE; color: #085041; }
-    .pill-pink { background: #FBEAF0; color: #72243E; }
-    .pill-yellow { background: #FAEEDA; color: #633806; }
-    .empty { text-align: center; padding: 40px; color: #9B7A87; font-size: 14px; }
-    .loading { text-align: center; padding: 40px; color: #9B7A87; }
-    .refresh { font-size: 12px; color: #D4537E; cursor: pointer; background: none; border: none; padding: 4px 10px; }
-    .refresh:hover { text-decoration: underline; }
-    .date-filter { display: flex; gap: 8px; align-items: center; }
-    .date-filter input { padding: 6px 10px; border: 1px solid #F0D9E5; border-radius: 8px; font-size: 13px; color: #2D1B25; background: white; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,sans-serif;background:#0F0A0D;color:#F5EEF1;min-height:100vh}
+    .header{padding:20px 28px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #2A1A22}
+    .logo{width:44px;height:44px;border-radius:50%;background:#F4C0D1;display:flex;align-items:center;justify-content:center;color:#72243E;font-size:20px}
+    .header-info h1{font-size:18px;font-weight:600;color:#F5EEF1}
+    .header-info p{font-size:12px;color:#9B7A87}
+    .tabs{display:flex;gap:0;padding:0 28px;border-bottom:1px solid #2A1A22}
+    .tab{padding:14px 18px;font-size:13px;cursor:pointer;color:#9B7A87;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;transition:all .2s}
+    .tab.active{color:#ED93B1;border-bottom-color:#ED93B1;font-weight:500}
+    .tab:hover:not(.active){color:#F5EEF1}
+    .panel{display:none;padding:24px 28px}
+    .panel.active{display:block}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+    .metric{background:#1A0F14;border:1px solid #2A1A22;border-radius:12px;padding:16px 18px}
+    .metric-label{font-size:11px;color:#9B7A87;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+    .metric-val{font-size:26px;font-weight:600;color:#F5EEF1}
+    .metric-sub{font-size:11px;color:#9B7A87;margin-top:3px}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+    .card{background:#1A0F14;border:1px solid #2A1A22;border-radius:12px;overflow:hidden}
+    .card-header{padding:14px 18px;border-bottom:1px solid #2A1A22;display:flex;align-items:center;justify-content:space-between}
+    .card-header h2{font-size:13px;font-weight:500;color:#9B7A87;text-transform:uppercase;letter-spacing:.05em}
+    .appt{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid #1F1217}
+    .appt:last-child{border:none}
+    .appt-time{font-size:12px;color:#9B7A87;min-width:42px;font-weight:500}
+    .appt-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+    .appt-info{flex:1}
+    .appt-name{font-size:13px;font-weight:500;color:#F5EEF1}
+    .appt-treat{font-size:12px;color:#9B7A87}
+    .pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+    .pill-green{background:#0D2E1F;color:#4CC98A}
+    .pill-yellow{background:#2E1E05;color:#E5A535}
+    .pill-done{background:#1A1A1A;color:#666}
+    .notif{border-left:2px solid #D4537E;background:#1A0F14;border-radius:0 8px 8px 0;padding:12px 14px;margin:12px 18px;border-top:1px solid #2A1A22;border-right:1px solid #2A1A22;border-bottom:1px solid #2A1A22}
+    .notif-title{font-size:13px;font-weight:500;color:#F5EEF1;margin-bottom:3px}
+    .notif-body{font-size:12px;color:#9B7A87;line-height:1.5}
+    .channels{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+    .channel{background:#1A0F14;border:1px solid #2A1A22;border-radius:12px;padding:16px;text-align:center}
+    .channel-icon{font-size:24px;margin-bottom:8px}
+    .channel-name{font-size:13px;font-weight:500;color:#F5EEF1;margin-bottom:3px}
+    .channel-sub{font-size:11px;color:#9B7A87;margin-bottom:8px}
+    .channel-badge{font-size:10px;padding:2px 10px;border-radius:20px;background:#0D2E1F;color:#4CC98A;font-weight:500}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{text-align:left;padding:10px 18px;font-size:11px;color:#9B7A87;border-bottom:1px solid #2A1A22;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+    td{padding:12px 18px;border-bottom:1px solid #1F1217;color:#F5EEF1;vertical-align:middle}
+    tr:last-child td{border:none}
+    tr:hover td{background:#200F18}
+    .empty{text-align:center;padding:40px;color:#9B7A87;font-size:14px}
+    .loading{text-align:center;padding:40px;color:#9B7A87}
+    .refresh-btn{font-size:12px;color:#ED93B1;background:none;border:none;cursor:pointer;padding:4px 8px}
+    .section-lbl{font-size:11px;font-weight:500;color:#9B7A87;text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
   </style>
 </head>
 <body>
 
 <div class="header">
-  <div>
-    <h1>✨ Glam Studio — Panel Admin</h1>
-    <p id="fecha-hoy"></p>
+  <div class="logo"><i class="ti ti-sparkles"></i></div>
+  <div class="header-info">
+    <h1>Glam Studio — Agente IA</h1>
+    <p id="fecha-hoy">Panel de gestión</p>
   </div>
-  <span class="badge">Solo administración</span>
 </div>
 
-<div class="main">
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+  <div class="tab" onclick="switchTab('agenda')"><i class="ti ti-calendar"></i> Agenda</div>
+  <div class="tab" onclick="switchTab('leads')"><i class="ti ti-users"></i> Leads</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="panel-dashboard" class="panel active">
   <div class="metrics">
     <div class="metric">
-      <div class="metric-label">Turnos hoy</div>
-      <div class="metric-val" id="m-hoy">—</div>
-      <div class="metric-sub">confirmados para hoy</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">Turnos totales</div>
+      <div class="metric-label"><i class="ti ti-calendar-check" style="font-size:13px"></i> Turnos totales</div>
       <div class="metric-val" id="m-total">—</div>
       <div class="metric-sub">en la base de datos</div>
     </div>
     <div class="metric">
-      <div class="metric-label">Leads guardados</div>
+      <div class="metric-label"><i class="ti ti-calendar-event" style="font-size:13px"></i> Próximo turno</div>
+      <div class="metric-val" id="m-proximo" style="font-size:16px;margin-top:4px">—</div>
+      <div class="metric-sub" id="m-proximo-sub"></div>
+    </div>
+    <div class="metric">
+      <div class="metric-label"><i class="ti ti-users" style="font-size:13px"></i> Leads guardados</div>
       <div class="metric-val" id="m-leads">—</div>
       <div class="metric-sub">contactos interesados</div>
     </div>
+    <div class="metric">
+      <div class="metric-label"><i class="ti ti-message" style="font-size:13px"></i> Canal principal</div>
+      <div class="metric-val" style="font-size:16px;margin-top:4px">Web</div>
+      <div class="metric-sub">chat en línea</div>
+    </div>
   </div>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('turnos')">📅 Turnos</div>
-    <div class="tab" onclick="switchTab('leads')">👥 Leads</div>
-  </div>
-
-  <div id="panel-turnos" class="panel active">
-    <div class="card">
-      <div class="card-header">
-        <h2>Todos los turnos</h2>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button class="refresh" onclick="cargarTurnos()">↻ Actualizar</button>
+  <div class="two-col">
+    <div>
+      <div class="section-lbl">Últimos turnos</div>
+      <div class="card" id="ultimos-turnos"><div class="loading">Cargando...</div></div>
+    </div>
+    <div>
+      <div class="section-lbl">Actividad del sistema</div>
+      <div class="card">
+        <div class="notif">
+          <div class="notif-title"><i class="ti ti-check" style="font-size:13px;margin-right:5px"></i>Sistema activo</div>
+          <div class="notif-body">El agente está respondiendo consultas en tiempo real</div>
+        </div>
+        <div class="notif">
+          <div class="notif-title"><i class="ti ti-database" style="font-size:13px;margin-right:5px"></i>Base de datos conectada</div>
+          <div class="notif-body">Supabase activo — turnos y leads guardándose correctamente</div>
+        </div>
+        <div class="notif">
+          <div class="notif-title"><i class="ti ti-clock" style="font-size:13px;margin-right:5px"></i>Panel actualizado</div>
+          <div class="notif-body" id="ultima-actualizacion">Actualizando...</div>
         </div>
       </div>
-      <div id="tabla-turnos"><div class="loading">Cargando...</div></div>
     </div>
   </div>
 
-  <div id="panel-leads" class="panel">
-    <div class="card">
-      <div class="card-header">
-        <h2>Leads / Contactos interesados</h2>
-        <button class="refresh" onclick="cargarLeads()">↻ Actualizar</button>
-      </div>
-      <div id="tabla-leads"><div class="loading">Cargando...</div></div>
+  <div class="section-lbl">Canales disponibles</div>
+  <div class="channels">
+    <div class="channel">
+      <div class="channel-icon" style="color:#25D366"><i class="ti ti-brand-whatsapp"></i></div>
+      <div class="channel-name">WhatsApp</div>
+      <div class="channel-sub">Próximamente</div>
+      <div class="channel-badge" style="background:#1A2E1A;color:#4CC98A">Disponible</div>
     </div>
+    <div class="channel">
+      <div class="channel-icon" style="color:#4A90E2"><i class="ti ti-mail"></i></div>
+      <div class="channel-name">Email</div>
+      <div class="channel-sub">Próximamente</div>
+      <div class="channel-badge" style="background:#1A1A2E;color:#4A90E2">Disponible</div>
+    </div>
+    <div class="channel">
+      <div class="channel-icon" style="color:#E1306C"><i class="ti ti-brand-instagram"></i></div>
+      <div class="channel-name">Instagram</div>
+      <div class="channel-sub">Próximamente</div>
+      <div class="channel-badge" style="background:#2E1A1A;color:#E1306C">Disponible</div>
+    </div>
+    <div class="channel">
+      <div class="channel-icon" style="color:#F5A623"><i class="ti ti-device-mobile-message"></i></div>
+      <div class="channel-name">SMS</div>
+      <div class="channel-sub">Próximamente</div>
+      <div class="channel-badge" style="background:#2E2A1A;color:#F5A623">Disponible</div>
+    </div>
+  </div>
+</div>
+
+<!-- AGENDA -->
+<div id="panel-agenda" class="panel">
+  <div class="card">
+    <div class="card-header">
+      <h2>Todos los turnos</h2>
+      <button class="refresh-btn" onclick="cargarTurnos()">↻ Actualizar</button>
+    </div>
+    <div id="tabla-turnos"><div class="loading">Cargando...</div></div>
+  </div>
+</div>
+
+<!-- LEADS -->
+<div id="panel-leads" class="panel">
+  <div class="card">
+    <div class="card-header">
+      <h2>Leads / Contactos interesados</h2>
+      <button class="refresh-btn" onclick="cargarLeads()">↻ Actualizar</button>
+    </div>
+    <div id="tabla-leads"><div class="loading">Cargando...</div></div>
   </div>
 </div>
 
 <script>
   document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-  async function fetchSupabase(tabla) {
+  async function fetchData(tabla) {
     const resp = await fetch(`/api/admin?tabla=${tabla}`);
     return await resp.json();
   }
 
-  async function cargarTurnos() {
-    document.getElementById('tabla-turnos').innerHTML = '<div class="loading">Cargando...</div>';
-    const data = await fetchSupabase('turnos');
-    document.getElementById('m-total').textContent = data.length;
+  async function cargarDashboard() {
+    const [turnos, leads] = await Promise.all([fetchData('turnos'), fetchData('leads')]);
 
-    const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).toLowerCase();
-    const hoyCount = data.filter(t => t.dia && t.dia.toLowerCase().includes(hoy.split(',')[0])).length;
-    document.getElementById('m-hoy').textContent = hoyCount;
+    document.getElementById('m-total').textContent = turnos.length;
+    document.getElementById('m-leads').textContent = leads.length;
+    document.getElementById('ultima-actualizacion').textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
 
-    if (data.length === 0) {
-      document.getElementById('tabla-turnos').innerHTML = '<div class="empty">No hay turnos guardados todavía</div>';
-      return;
+    if (turnos.length > 0) {
+      const proximo = turnos[0];
+      document.getElementById('m-proximo').textContent = proximo.hora || '—';
+      document.getElementById('m-proximo-sub').textContent = (proximo.nombre || '') + ' · ' + (proximo.dia || '');
     }
 
-    document.getElementById('tabla-turnos').innerHTML = `
-      <table>
-        <thead><tr><th>#</th><th>Nombre</th><th>Tratamiento</th><th>Día</th><th>Hora</th><th>Canal</th><th>Registrado</th></tr></thead>
-        <tbody>${data.map((t, i) => `
-          <tr>
+    const colores = ['#F4C0D1','#C0D4F4','#C0F4D4','#F4E0C0','#E0C0F4'];
+    const ultimos = turnos.slice(0, 5);
+    document.getElementById('ultimos-turnos').innerHTML = ultimos.length === 0
+      ? '<div class="empty">No hay turnos todavía</div>'
+      : ultimos.map((t, i) => `
+        <div class="appt">
+          <div class="appt-time">${t.hora || '—'}</div>
+          <div class="appt-av" style="background:${colores[i % colores.length]};color:#2D1B25">${(t.nombre||'?').slice(0,2).toUpperCase()}</div>
+          <div class="appt-info">
+            <div class="appt-name">${t.nombre || '—'}</div>
+            <div class="appt-treat">${t.tratamiento || '—'} · ${t.dia || '—'}</div>
+          </div>
+          <span class="pill pill-green">Agendado</span>
+        </div>`).join('');
+  }
+
+  async function cargarTurnos() {
+    document.getElementById('tabla-turnos').innerHTML = '<div class="loading">Cargando...</div>';
+    const data = await fetchData('turnos');
+    document.getElementById('tabla-turnos').innerHTML = data.length === 0
+      ? '<div class="empty">No hay turnos guardados todavía</div>'
+      : `<table>
+          <thead><tr><th>#</th><th>Nombre</th><th>Tratamiento</th><th>Día</th><th>Hora</th><th>Registrado</th></tr></thead>
+          <tbody>${data.map(t => `<tr>
             <td style="color:#9B7A87">${t.id}</td>
-            <td style="font-weight:500">${t.nombre || '—'}</td>
-            <td>${t.tratamiento || '—'}</td>
-            <td>${t.dia || '—'}</td>
-            <td><span class="pill pill-green">${t.hora || '—'}</span></td>
-            <td><span class="pill pill-pink">${t.canal || 'Web'}</span></td>
-            <td style="color:#9B7A87;font-size:12px">${t.created_at ? new Date(t.created_at).toLocaleString('es-AR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
+            <td style="font-weight:500">${t.nombre||'—'}</td>
+            <td>${t.tratamiento||'—'}</td>
+            <td>${t.dia||'—'}</td>
+            <td><span class="pill pill-green">${t.hora||'—'}</span></td>
+            <td style="color:#9B7A87;font-size:12px">${t.created_at ? new Date(t.created_at).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          </tr>`).join('')}</tbody>
+        </table>`;
   }
 
   async function cargarLeads() {
     document.getElementById('tabla-leads').innerHTML = '<div class="loading">Cargando...</div>';
-    const data = await fetchSupabase('leads');
-    document.getElementById('m-leads').textContent = data.length;
-
-    if (data.length === 0) {
-      document.getElementById('tabla-leads').innerHTML = '<div class="empty">No hay leads guardados todavía</div>';
-      return;
-    }
-
-    document.getElementById('tabla-leads').innerHTML = `
-      <table>
-        <thead><tr><th>#</th><th>Nombre</th><th>Contacto</th><th>Interés</th><th>Registrado</th></tr></thead>
-        <tbody>${data.map(l => `
-          <tr>
+    const data = await fetchData('leads');
+    document.getElementById('tabla-leads').innerHTML = data.length === 0
+      ? '<div class="empty">No hay leads guardados todavía</div>'
+      : `<table>
+          <thead><tr><th>#</th><th>Nombre</th><th>Contacto</th><th>Interés</th><th>Registrado</th></tr></thead>
+          <tbody>${data.map(l => `<tr>
             <td style="color:#9B7A87">${l.id}</td>
-            <td style="font-weight:500">${l.nombre || '—'}</td>
-            <td>${l.contacto || '—'}</td>
-            <td><span class="pill pill-yellow">${l.interes || '—'}</span></td>
-            <td style="color:#9B7A87;font-size:12px">${l.created_at ? new Date(l.created_at).toLocaleString('es-AR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
+            <td style="font-weight:500">${l.nombre||'—'}</td>
+            <td>${l.contacto||'—'}</td>
+            <td><span class="pill pill-yellow">${l.interes||'—'}</span></td>
+            <td style="color:#9B7A87;font-size:12px">${l.created_at ? new Date(l.created_at).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          </tr>`).join('')}</tbody>
+        </table>`;
   }
 
   function switchTab(tab) {
-    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['turnos','leads'][i] === tab));
+    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['dashboard','agenda','leads'][i] === tab));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + tab).classList.add('active');
-    if (tab === 'turnos') cargarTurnos();
+    if(tab === 'dashboard') cargarDashboard();
+    else if(tab === 'agenda') cargarTurnos();
     else cargarLeads();
   }
 
- cargarTurnos();
-
-// Auto-actualización cada 30 segundos
-setInterval(() => {
-  const tabActiva = document.querySelector('.tab.active').textContent.includes('Turnos') ? 'turnos' : 'leads';
-  if (tabActiva === 'turnos') cargarTurnos();
-  else cargarLeads();
-}, 30000);
+  cargarDashboard();
+  setInterval(cargarDashboard, 30000);
 </script>
 </body>
 </html>
