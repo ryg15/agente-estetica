@@ -63,7 +63,7 @@ export default async function handler(req, res) {
 
   async function ejecutarHerramienta(nombre, input) {
     if (nombre === 'verificar_disponibilidad') {
-      const resp = await fetch(`${supabaseUrl}/rest/v1/turnos?dia=eq.${encodeURIComponent(input.dia)}&hora=eq.${encodeURIComponent(input.hora)}&select=id`, {
+      const resp = await fetch(`${supabaseUrl}/rest/v1/turnos?dia=ilike.${encodeURIComponent(input.dia)}&hora=eq.${encodeURIComponent(input.hora)}&select=id`, {
         headers: {
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`
