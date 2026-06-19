@@ -6,7 +6,17 @@ export default async function handler(req, res) {
   const { messages } = req.body;
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-  const fechaActual = new Date().toLocaleString('es-AR', { timeZone: 'America/New_York', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  const ahora = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const fechaActual = ahora.toLocaleString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+  const diasSemana = [];
+  for (let i = 0; i < 30; i++) {
+    const dia = new Date(ahora);
+    dia.setDate(ahora.getDate() + i);
+    diasSemana.push(dia.toLocaleString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }));
+  }
+  const calendarioMes = diasSemana.join('\n');
 
   const tools = [
     {
@@ -15,7 +25,7 @@ export default async function handler(req, res) {
       input_schema: {
         type: 'object',
         properties: {
-          dia: { type: 'string', description: 'Día del turno' },
+          dia: { type: 'string', description: 'Día del turno exacto como aparece en el calendario' },
           hora: { type: 'string', description: 'Hora del turno' }
         },
         required: ['dia', 'hora']
@@ -112,6 +122,9 @@ export default async function handler(req, res) {
         system: `Sos el asistente virtual de Glam Studio, una estética premium en Miami.
 La fecha y hora actual es: ${fechaActual}.
 
+Calendario de los próximos 30 días (usá estas fechas exactas al agendar, nunca inventes fechas):
+${calendarioMes}
+
 Tu trabajo es:
 1. Detectar el idioma en que escribe la clienta y responder siempre en ese mismo idioma
 2. Responder consultas sobre tratamientos con calidez y profesionalismo
@@ -124,16 +137,17 @@ Tu trabajo es:
 
 Tratamientos disponibles:
 - Limpieza facial profunda: $850 · 60min
-- Hydrafacial premium: $1.200 · 75min
+- Hydrafacial premium: $1200 · 75min
 - Peeling vitamina C: $620 · 45min
 - Peeling químico: $980 · 45min
-- Drenaje linfático: $1.050 · 90min
+- Drenaje linfático: $1050 · 90min
 - Masaje relajante: $800 · 60min
-- Masaje con piedras calientes: $950 · 90min
+- Masaje con piedras calientes: $900 · 90min
 
 Horarios: lunes a sábado 9:00 a 19:00.
 
 Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Confirmá el turno en la base de datos de todas formas y avisale a la clienta que tiene 2 horas para enviar la seña, caso contrario el turno se libera.
+
 Usá tono cálido y profesional. Usá saltos de línea para fácil lectura.`,
         messages: historial
       })
