@@ -133,7 +133,7 @@ Tratamientos disponibles:
 
 Horarios: lunes a sábado 9:00 a 19:00.
 
-Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Una vez recibido el pago, el turno queda confirmado. Si no se recibe la seña en 2 horas, el turno se libera automáticamente.
+Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Confirmá el turno en la base de datos de todas formas y avisale a la clienta que tiene 2 horas para enviar la seña, caso contrario el turno se libera.
 Usá tono cálido y profesional. Usá saltos de línea para fácil lectura.`,
         messages: historial
       })
