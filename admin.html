@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glam Studio — Panel Admin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, sans-serif; background: #FDF6F9; color: #2D1B25; }
+    .header { background: white; padding: 16px 24px; border-bottom: 1px solid #F0D9E5; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .header p { font-size: 12px; color: #9B7A87; }
+    .badge { background: #F4C0D1; color: #72243E; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .main { padding: 24px; max-width: 1000px; margin: 0 auto; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid #F0D9E5; }
+    .tab { padding: 10px 20px; font-size: 14px; cursor: pointer; color: #9B7A87; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .tab.active { color: #D4537E; border-bottom-color: #D4537E; font-weight: 500; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
+    .metric { background: white; border: 1px solid #F0D9E5; border-radius: 12px; padding: 16px 20px; }
+    .metric-label { font-size: 12px; color: #9B7A87; margin-bottom: 6px; }
+    .metric-val { font-size: 28px; font-weight: 600; color: #2D1B25; }
+    .metric-sub { font-size: 11px; color: #9B7A87; margin-top: 4px; }
+    .card { background: white; border: 1px solid #F0D9E5; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+    .card-header { padding: 14px 20px; border-bottom: 1px solid #F0D9E5; display: flex; align-items: center; justify-content: space-between; }
+    .card-header h2 { font-size: 14px; font-weight: 500; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 10px 16px; font-size: 11px; color: #9B7A87; border-bottom: 1px solid #F0D9E5; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+    td { padding: 12px 16px; border-bottom: 1px solid #FDF6F9; vertical-align: middle; }
+    tr:last-child td { border: none; }
+    tr:hover td { background: #FDF6F9; }
+    .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .pill-green { background: #E1F5EE; color: #085041; }
+    .pill-pink { background: #FBEAF0; color: #72243E; }
+    .pill-yellow { background: #FAEEDA; color: #633806; }
+    .empty { text-align: center; padding: 40px; color: #9B7A87; font-size: 14px; }
+    .loading { text-align: center; padding: 40px; color: #9B7A87; }
+    .refresh { font-size: 12px; color: #D4537E; cursor: pointer; background: none; border: none; padding: 4px 10px; }
+    .refresh:hover { text-decoration: underline; }
+    .date-filter { display: flex; gap: 8px; align-items: center; }
+    .date-filter input { padding: 6px 10px; border: 1px solid #F0D9E5; border-radius: 8px; font-size: 13px; color: #2D1B25; background: white; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>✨ Glam Studio — Panel Admin</h1>
+    <p id="fecha-hoy"></p>
+  </div>
+  <span class="badge">Solo administración</span>
+</div>
+
+<div class="main">
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Turnos hoy</div>
+      <div class="metric-val" id="m-hoy">—</div>
+      <div class="metric-sub">confirmados para hoy</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Turnos totales</div>
+      <div class="metric-val" id="m-total">—</div>
+      <div class="metric-sub">en la base de datos</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Leads guardados</div>
+      <div class="metric-val" id="m-leads">—</div>
+      <div class="metric-sub">contactos interesados</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('turnos')">📅 Turnos</div>
+    <div class="tab" onclick="switchTab('leads')">👥 Leads</div>
+  </div>
+
+  <div id="panel-turnos" class="panel active">
+    <div class="card">
+      <div class="card-header">
+        <h2>Todos los turnos</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="refresh" onclick="cargarTurnos()">↻ Actualizar</button>
+        </div>
+      </div>
+      <div id="tabla-turnos"><div class="loading">Cargando...</div></div>
+    </div>
+  </div>
+
+  <div id="panel-leads" class="panel">
+    <div class="card">
+      <div class="card-header">
+        <h2>Leads / Contactos interesados</h2>
+        <button class="refresh" onclick="cargarLeads()">↻ Actualizar</button>
+      </div>
+      <div id="tabla-leads"><div class="loading">Cargando...</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://dkotizlgltweigqrqoxz.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_tjdwg63KF1B99L1PtTM8jw_XJPDXIdb';
+
+  document.getElementById('fecha-hoy').textContent = new Date().toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  async function fetchSupabase(tabla) {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabla}?order=created_at.desc`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+    return await resp.json();
+  }
+
+  async function cargarTurnos() {
+    document.getElementById('tabla-turnos').innerHTML = '<div class="loading">Cargando...</div>';
+    const data = await fetchSupabase('turnos');
+    document.getElementById('m-total').textContent = data.length;
+
+    const hoy = new Date().toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }).toLowerCase();
+    const hoyCount = data.filter(t => t.dia && t.dia.toLowerCase().includes(hoy.split(',')[0])).length;
+    document.getElementById('m-hoy').textContent = hoyCount;
+
+    if (data.length === 0) {
+      document.getElementById('tabla-turnos').innerHTML = '<div class="empty">No hay turnos guardados todavía</div>';
+      return;
+    }
+
+    document.getElementById('tabla-turnos').innerHTML = `
+      <table>
+        <thead><tr><th>#</th><th>Nombre</th><th>Tratamiento</th><th>Día</th><th>Hora</th><th>Canal</th><th>Registrado</th></tr></thead>
+        <tbody>${data.map((t, i) => `
+          <tr>
+            <td style="color:#9B7A87">${t.id}</td>
+            <td style="font-weight:500">${t.nombre || '—'}</td>
+            <td>${t.tratamiento || '—'}</td>
+            <td>${t.dia || '—'}</td>
+            <td><span class="pill pill-green">${t.hora || '—'}</span></td>
+            <td><span class="pill pill-pink">${t.canal || 'Web'}</span></td>
+            <td style="color:#9B7A87;font-size:12px">${t.created_at ? new Date(t.created_at).toLocaleString('es-AR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  async function cargarLeads() {
+    document.getElementById('tabla-leads').innerHTML = '<div class="loading">Cargando...</div>';
+    const data = await fetchSupabase('leads');
+    document.getElementById('m-leads').textContent = data.length;
+
+    if (data.length === 0) {
+      document.getElementById('tabla-leads').innerHTML = '<div class="empty">No hay leads guardados todavía</div>';
+      return;
+    }
+
+    document.getElementById('tabla-leads').innerHTML = `
+      <table>
+        <thead><tr><th>#</th><th>Nombre</th><th>Contacto</th><th>Interés</th><th>Registrado</th></tr></thead>
+        <tbody>${data.map(l => `
+          <tr>
+            <td style="color:#9B7A87">${l.id}</td>
+            <td style="font-weight:500">${l.nombre || '—'}</td>
+            <td>${l.contacto || '—'}</td>
+            <td><span class="pill pill-yellow">${l.interes || '—'}</span></td>
+            <td style="color:#9B7A87;font-size:12px">${l.created_at ? new Date(l.created_at).toLocaleString('es-AR', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['turnos','leads'][i] === tab));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'turnos') cargarTurnos();
+    else cargarLeads();
+  }
+
+  cargarTurnos();
+</script>
+</body>
+</html>
