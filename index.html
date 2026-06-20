@@ -132,7 +132,10 @@
     send();
   }
 
-  addMsg('agent', '¡Hola! Soy Valentina de Glam Studio ✨ ¿En qué te puedo ayudar hoy?');
+  const bienvenida = '¡Hola! Soy Valentina de Glam Studio ✨ ¿En qué te puedo ayudar hoy?';
+addMsg('agent', bienvenida);
+history.push({ role: 'user', content: 'hola' });
+history.push({ role: 'assistant', content: bienvenida });
 </script>
 </body>
 </html>
