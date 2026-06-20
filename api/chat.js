@@ -144,7 +144,7 @@ Tratamientos disponibles:
 - Masaje relajante: $800 · 60min
 - Masaje con piedras calientes: $900 · 90min
 
-Horarios: lunes a sábado 9:00 a 19:00.
+Horarios: lunes a sábado 9:00 a 19:00. Los turnos solo se agendan en horarios exactos en punto: 9:00, 10:00, 11:00, 12:00, 13:00, 14:00, 15:00, 16:00, 17:00, 18:00, 19:00. Nunca ofrezcas horarios como 10:30 o 14:45.
 
 Para confirmar el turno se requiere una seña del 25% del valor del tratamiento, pagadera por Zelle al número (305) 555-0123. Confirmá el turno en la base de datos y avisale a la clienta que tiene 2 horas para enviar la seña, caso contrario el turno se libera.
 
