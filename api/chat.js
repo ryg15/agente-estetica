@@ -25,8 +25,8 @@ module.exports = async function handler(req, res) {
       input_schema: {
         type: 'object',
         properties: {
-          dia: { type: 'string', description: 'Dia exacto como aparece en el calendario' },
-          hora: { type: 'string', description: 'Hora del turno' }
+          dia: { type: 'string' },
+          hora: { type: 'string' }
         },
         required: ['dia', 'hora']
       }
@@ -41,53 +41,3 @@ module.exports = async function handler(req, res) {
           tratamiento: { type: 'string' },
           dia: { type: 'string' },
           hora: { type: 'string' },
-          canal: { type: 'string' }
-        },
-        required: ['nombre', 'tratamiento', 'dia', 'hora']
-      }
-    },
-    {
-      name: 'guardar_lead',
-      description: 'Guarda una clienta interesada. Solo llama cuando tengas nombre Y contacto (WhatsApp o email).',
-      input_schema: {
-        type: 'object',
-        properties: {
-          nombre: { type: 'string' },
-          contacto: { type: 'string' },
-          interes: { type: 'string' }
-        },
-        required: ['nombre', 'contacto', 'interes']
-      }
-    }
-  ];
-
-  async function ejecutarHerramienta(nombre, input) {
-    if (nombre === 'verificar_disponibilidad') {
-      const resp = await fetch(`${supabaseUrl}/rest/v1/turnos?dia=ilike.${encodeURIComponent(input.dia)}&hora=eq.${encodeURIComponent(input.hora)}&select=id`, {
-        headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-      });
-      const data = await resp.json();
-      if (data.length > 0) {
-        return 'El turno ya esta ocupado. Ofrece otro horario disponible.';
-      }
-      return 'El turno esta disponible.';
-    }
-
-    if (nombre === 'guardar_turno') {
-      await fetch(`${supabaseUrl}/rest/v1/turnos`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(input)
-      });
-      return 'Turno guardado para ' + input.nombre + ' el ' + input.dia + ' a las ' + input.hora;
-    }
-
-    if (nombre === 'guardar_lead') {
-      await fetch(`${supabaseUrl}/rest/v1/leads`, {
-        method: 'POST',
-        headers: {
